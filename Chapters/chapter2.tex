@@ -6,7 +6,7 @@
 %% Chapter with the template manual
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\typeout{NT FILE chapter2.tex}%
+\typeout{NT FILE chapter2.tex}
 
 \chapter{State-of-the-Art}
 
@@ -14,7 +14,8 @@
 
     In this chapter, we will present an overview of the current state-of-the-art in event detection and classification for video games. We will delineate the various events that can occur within various gaming sessions and the challenges that arise from each. Various approaches have been developed over the years and we will review them, and compare them against the most recent works that pertain to machine learning. We will also include some of the advancements in computer vision techniques that can be of use to the to be developed solution.  
 
-\section{Gaming and sports video analysis}  % resulting in the features analysis (visual, audio, overlay text) and tools integrated to the game engine (NVIDIA Highlights [GeForce Experience])
+\section{Gaming and sports video analysis} 
+
     Many systems were created to detect events in video games. Some were implemented as fully automatic solutions and some others as semi-automatic. Still, any of them aimed to extract the most valuable information possible at each moment and translate it into a concise textual description.
 
     To extract all of that high-level information it is needed to collect low-level information and process them in a way that all together can translate to a particular high-level event. This low-level information can be denominated as \gls{LLF}. These \gls{LLF} allow to extract direct information from visual or audio elements, such as the progression of color in a certain element or the variation of noise in a certain frequency.
@@ -30,14 +31,9 @@
 
     The following section presents a synopsis of the features present in video game feeds, as well as the strategies used to retrieve them. First, it introduces approaches made to sports videos that can be applied to video game feeds in the solution to be developed. Then it clarifies approaches already developed for video game feed and its system of event detection and highlights detection.
 
-% \section{Analyzing Features in Video Game Streams}
-% Dividing the games by genres and identifying features that belong to those genres
-% Turn-based rounds: Turns;
-% 
-
 \subsection{Visual Patterns Analysis in Sports videos}
 
-    Extracting visual \gls{LLF} involves obtaining information from pixel intensity values, edges, color histograms, and other elements. These features are identifiable for their ease of definition and extraction but possess limited semantic significance \cite{INTERACTION_BETWEEN_MODULES_IN_LEARNING_SYSTEMS_FO}. Nonetheless, relying solely on \gls{LLF} is insufficient for the development of intricate projects, such as automatic event detection due to the semantic gap.
+    Extracting visual \gls{LLF} involves obtaining information from pixel intensity values, edges, color histograms, and other elements. These features are identifiable for their ease of definition and extraction but possess limited semantic significance \cite{interaction_between_modules_in_learning_systems_for_vision_applications}. Nonetheless, relying solely on \gls{LLF} is insufficient for the development of intricate projects, such as automatic event detection due to the semantic gap.
 
     Therefore, to create a visual model to analyze a video game feed it is needed to rely upon \gls{MLR}. Visual \gls{MLR} are semantic concepts, which are derived from specific combinations of \gls{LLF}. In sports videos those specific combinations are related to standard camera shooting style transmission practices and domain-specific objects and their locations \cite{SOCCER_VIDEO_EVENT_DETECTION}, and in video games feeds are related to camera settings. Because the camera settings vary among individuals, the visual patterns are not identical but rather exhibit similarities.
 
@@ -51,784 +47,80 @@
 
     The audio component of a sports video such as the voice of the commentator, music, and various kinds of environmental sounds is a very important type of media and very correlated to the video component. Various previous works on audio analysis have been developed to complement the visual component, such as \cite{AutomaticDetectionGoalSegmentsBasketball}\cite{AutomaticextractionHighlightsBaseball}\cite{AudioKeywordsSoccerVideo}.
 
+    The most basic concept used in audio pattern analysis is the audio keyword. This concept refers to any sound that is used in a game environment to describe the actions of players, referees, commentators, and audience \cite{AudioKeywordsSoccerVideo}. As depicted in Figure \ref{fig:LLF_HLS_realtion}, audio keywords can represent aural \gls{MLR}, which combined with some domain knowledge can construct the \gls{HLS}. These representations can be generated from different audio \gls{LLF} and supported by algorithms. In \cite{AudioKeywordsSportsAnalysis} is proposed an audio keyword generation system with an adaptive \gls{HMM} to correct a previous system that compromised of a hierarchical \gls{SVM} classifier where a frame-based classification followed segments of frames of 20 ms. In this previous system, for diverse sports games, the task involved gathering substantial audio samples and manually labeling them to train keyword recognizers, thereby enhancing performance across a range of sports activities.
+
+    As shown in \ref{fig:HMM-based_keywordGenerator}, the proposed system consists of the following steps to create \gls{HMM} probabilities. The \gls{LLF}, such as the energy and the power of a signal, and pitch features including the fundamental frequency and harmonic frequencies of a signal, are extracted and tokens are added to create an observation vector. Next, the training of the \gls{HMM} models is performed using dynamic programming. With those \gls{HMM} models obtained the next step is to select testing data to compare with the incoming audio testing. The testing audio sequence is labeled as a series of predefined audio keywords according to the maximum posterior probability.
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=1.0\linewidth]{Chapters/Figures/KeywordsSystemHMM.png}
+        \caption{\gls{HMM}-based audio keyword generation system (adapted from \cite{AudioKeywordsSportsAnalysis})}
+        \label{fig:HMM-based_keywordGenerator}
+    \end{figure}
+
+    This proposed system was then put to the test. The experimental audio data came from tennis, soccer, and basketball game videos with a total length of 2 hours. To analyze the influence of different \gls{HMM} structures and different sample sequence lengths on the performance of the systems as one was conducted some experiments, resulting in a 4-state left-right structure. For audio keywords that were of short duration, like whistling and the rebound of a ball in the courts, a length of 0.2 seconds was chosen, but for those related to speeches and interactions of the audience, it was selected a length of 1 second. The ones with a longer length are closely related to moments of high intensity and excitement, so it is used for highlight detection, thus the demonstration emphasized the generation of excited commentator speech and excited audience. In Table \ref{tab:ExperimentalResultsHMMbasedKeywords}, were listed some partial experimental results that show the efficiency of this system when compared with the previous system (frame-level \gls{SVM} keyword classification) in Basketball videos. The improvement of 5\% in the recall and precision of those keywords related to highlight detection indicates a better performance of the newly developed system.
+
+    \begin{table}[htbp]
+        \centering
+        \begin{tabular}{|c|c|c|c|}
+        \hline
+        \rowcolor[HTML]{C0C0C0} 
+        {\ul \textbf{Audio keywords}}                                       & {\ul \textbf{Methods}} & {\ul \textbf{Recall (\%)}} & {\ul \textbf{Precision (\%)}} \\ \hline
+        \cellcolor[HTML]{EFEFEF}                                            &\gls{SVM}                    & 99.45                      & 99.45                         \\ \cline{2-4} 
+        \multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}{\ul Whistling}}           &\gls{HMM}                   & 100                        & 100                           \\ \hline
+        \cellcolor[HTML]{EFEFEF}                                            &\gls{SVM}                   & 83.71                      & 79.52                         \\ \cline{2-4} 
+        \multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}{\ul Audience}}            &\gls{HMM}                   & 95.74                      & 95.74                         \\ \hline
+        \cellcolor[HTML]{EFEFEF}                                            &\gls{SVM}                    & 79.09                      & 78.27                         \\ \cline{2-4} 
+        \multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}{\ul Commentator}}         &\gls{HMM}                   & 98.04                      & 94.34                         \\ \hline
+        \cellcolor[HTML]{EFEFEF}                                            &\gls{SVM}                   & 80.14                      & 81.17                         \\ \cline{2-4} 
+        \multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}{\ul Excited Audience}}    &\gls{HMM}                    & 85.71                      & 85.71                         \\ \hline
+        \cellcolor[HTML]{EFEFEF}                                            &\gls{SVM}                   & 78.44                      & 82.57                         \\ \cline{2-4} 
+        \multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}{\ul Excited Commentator}} &\gls{HMM}                    & 86.67                      & 100                           \\ \hline
+        \end{tabular}
+        \caption{Comparison between \gls{HMM} and \gls{SVM} in detecting some of the audio features
+present in a basketball video (adapted from \cite{AudioKeywordsSportsAnalysis})}
+        \label{tab:ExperimentalResultsHMMbasedKeywords}
+    \end{table}
+    
+\subsection{Textual features Analysis in Sports videos}
+
+    The \gls{OText} present in sports videos can be divided into scene and superimposed text \cite{SOCCER_VIDEO_EVENT_DETECTION}. The former refers to text that appears naturally in the recording environment, such as names on players' jerseys, slogans on banners, the result of the game, and text messages identifying that a character of a player has been slain by another \cite{SOCCER_VIDEO_EVENT_DETECTION} \cite{BroadcatedGames_analysis_LOL}. The latter is text artificially overlaid onto the video using dedicated hardware and/or software, such as the chat where the viewers and streamers interact as depicted in Figure \ref{fig:TwitchStreamStructure} or the result of tagging webcast text in Baseball videos \cite{WebcastText_Baseball_Videos} or information about the rules of the game \cite{FusionAVFeatures_ExternalInformationSources}.
+
+    The article \cite{FusionAVFeatures_ExternalInformationSources} proposes a framework for event detection in American Football and Soccer videos that utilizes both audio and visual features analysis combined with a system to extract information from external sources. The visual feature analysis is used to detect players' trajectories, positions, and interactions, as well as the ball. Combined with the audio features analysis that captures the commentary, crowd noise and players' verbal interactions creates the \gls{AV} features analysis. The authors also proposed to incorporate external information sources to improve the event detection accuracy. These sources vary from the knowledge base of sports rules to rule out certain events as improbable or impossible, to the identification of the players that are actively on the court to rule out players that cannot be in the field and therefore cannot be tracked. To combine the \gls{AV} features with the external sources of information the system proposed refers to a \gls{FoF} and to a \gls{FoD} processes. The \gls{FoF} process refers to the process of combining the \gls{AV} features with the external sources before sending them as inputs to a classifier, such as Fisher's Linear Discriminant algorithm \cite{LinearDiscriminantAnalysis}. The \gls{FoD} process refers to combining individual classifiers, such as stacked \gls{SVM} and bagging algorithms. A third system is also proposed, the fusion of rank lists that uses a proposed algorithm of the article \cite{OptimalMultimodalFusion}.
+
+    The work in \cite{OTRecognition_SoccerConcepts} presents a solution to \gls{OText} Recognition applied to Soccer keywords, a solution fraught with challenges such as motion blur, occlusion, and variations in font and text size. The proposed method involves pre-processing video frames to mitigate noise and enhance contrast. Subsequently, a text detection algorithm is employed to pinpoint and extract the overlaid text. This process involves the application of the Sobel operator to the original frame. The complete process is described in Figure \ref{fig:OT_ExtractionRecognition}.
+
+    \begin{figure}[htbp]
+        \centering
+        \fboxsep=0pt\fboxrule=0.5pt
+        \fbox{\includegraphics[width=0.8\linewidth]{Chapters/Figures/OT_ExtractionRecognition.png}}%
+        \caption{Complete process of \gls{OText} extraction and recognition (adapted from \cite{OTRecognition_SoccerConcepts})}
+        \label{fig:OT_ExtractionRecognition}
+    \end{figure}
+
+    The Sobel operator \cite{SobelOperator} is a renowned technique for edge detection. It effectively identifies the sharp transitions in brightness that delineate the boundaries between objects and regions within an image. It utilizes two 3x3 masks, one for horizontal and one for vertical edges. Each mask contains positive and negative values arranged in a specific pattern that emphasizes the intensity gradient along a particular direction.
+
+    Subsequently, the obtained image undergoes element dilation, binarization, and morphological opening processes \cite{MorphologicalTransformations}. Finally, the textual information is encapsulated by boxes through component analysis.
+
+    With the regions of \gls{OText} already identified, it is now necessary to apply a technique to recognize the text. The technique used in the article is the \gls{OCR} technology \cite{OverviewTesseractOCREngine}. This technology is responsible for converting the image of a text into machine-encoded text, and its performance is increased accordingly with an increase in the contrast between the background and the letters, thus the use of the process of binarization \cite{ThresholdSelectionMethod}.
+
+    The devised approach to extract and identify overlaid text in soccer videos yields a collection of textual attributes suitable for event detection. These features, acquired using \gls{OCR} technology, can be cross-referenced with a predefined set of soccer-related keywords. Furthermore, the \gls{OCR} system can identify numerical values within the score marker, offering a valuable verification mechanism for event detection. This facilitates a precise determination of when significant events, such as goals or points, take place during the match.
+
+\section{Event detection and Highlight detection in Video games}
+
+    In this section, we will present two solutions for event detection and highlight detection in Video games. One uses an automatic feature analysis approach \cite{BroadcatedGames_analysis_LOL} and the other uses a tool adopted by industry-leading graphics engines such as  Unreal Engine 4.18 and Unity 5.6 to capture and share a gamer's bet moments \cite{NVIDIA_GeForce}.  
+
+\subsection*{Game engine integrated tools - NVIDIA Highlights}
+    
+    NVIDIA Highlights is a feature of GeForce Experience \cite{NVIDIA_GeForce} that automatically captures and saves in-game highlights for compatible games, and this cutting-edge highlight recording tool has been crafted through collaboration between NVIDIA and top-tier graphics engines in the industry. This tool empowers game developers to indicate key highlights during gameplay, triggering the creation of a video sequence from the player's viewpoint. Integrated seamlessly into Unity and Unreal, NVIDIA Highlights can also be implemented in other engines using their respective SDKs.
+
+\subsection*{Automatic feature analysis approach}
+
+    This article \cite{BroadcatedGames_analysis_LOL} proposes a framework for event detection and highlight detection in \gls{LOL}. 
+    
+    In video games like \gls{LOL} important events can be identified through all the types of \gls{LLF}. To infer the game progress of each session the system developed uses a similar approach as \cite{OTRecognition_SoccerConcepts}. For each video frame, is applied a preprocessing to detect \gls{ROI}, the Sobel edge detector to detect all the edges, and binarization to filter out the weak ones. Next, the morphological operations such as dilation and erosion filter out more weak edges and minimize the number of bounding boxes by eliminating the ones that are smaller than the minimum. Finally, it is employed the Tesseract OCR package to recognize text in each detected bounding box. When comparing the text resulting from the \gls{OCR} with the set of predefined sentences from the table with the domain knowledge it results in a non-match that box will be discarded. But when it matches the text will be used to represent an event.
+
+    The same article also depicts a system to detect highlights in a video game feed. This system extracts features from both the video and viewers and uses them to construct models based on a psychological approach and a data-driven approach, respectively. From the video segment, it is possible to extract features like motion intensity that increases accordingly with the peak interest that visual content can bring, frame dynamics that indicate possible visual effects like when invoking an ability, number of player characters that might indicate a group fight between the players, event ratio that indicates that if multiple import events are occurring in such short time it means that must be a highlight in creation, number of viewers chat that indicate that if a burst of chats messages occur it means that it is occurring a highlight, and the same applies to emojis in the chat. 
+
     
 
-<Audio Keyword Generation for Sports Video Analysis Min Xu1, Ling-Yu Duan2, Liang-Tien Chia1, Chang-sheng Xu2> (The selected low-level features are firstly extracted and tokens are added to create an observation vector. Secondly, we perform the training of initial HMM models using dynamic programming. Once the initial HMM models have been obtained, we can select a small number of testing data for adaptation for the incoming testing audio. Finally, we label the testing audio sequence as a series of predefined audio keywords according to the maximum posterior probability; HMM-based audio keyword generation system; Improved model of "Creating audio keywords for event detection in soccer video")
-
-<Audio Keywords Generation for Sports Video Analysis MIN XU> (The aural component of sports video can represent a significant part in semantic event detection. It is possible to isolate the keywords that can support a spectacularity measure of the events.)
-
-<>
-\subsection{Overlay Text Analysis in Sports videos}
-
-<SOCCER VIDEO EVENT DETECTION VIA COLLABORATIVE TEXTUAL, AURAL AND VISUAL ANALYSIS> (1- the extraction and
-analysis of external sources, including text from websites related to the sport and statistics
-foundon the internet; 2- Overlaid-text (OT). In other words, it is the textual data that appears on the screen
-during the game.)
-
-<Overlaid Text Recognition for Matching Soccer-Concept Keywords Alfian Abdul Halin, Mandava Rajeswari, Dhanesh Ramachandram> (Possible occurrences of over-laid text are extracted and compared to a database)
-
-
-\subsection{Event detection and Highlight detection in Video games}
-
-\subsubsection{}
-
-\subsubsection{Game engine integrated tools - NVIDIA Highlights}
-
-
-% \label{cha:users_manual}
-
-% \glsresetall
-
-% \begin{center}
-%   \fbox{\LARGE
-%     This manual is outdated and must be revised!}
-% \end{center}
-
-
-% \section{Introduction}
-% \label{sec:introduction}
-
-% This Chapter describes how to use the \gls{novathesis}\ template.  It is assumed that you have a working \index{installation} of \LaTeX, either local (in your own computer) or remote (in \Overleaf), and that you were able to generate a PDF for the default configuration of the template: a PhD thesis for \gls{FCT}.
-
-
-% \section{Quick Start}
-% \label{sec:quick_started}
-
-% \subsection{With a Local \LaTeX\ Installation} % (fold)
-% \label{sub:with_a_local_latex_installation}
-
-% Follow these steps to get started with a local \LaTeX\ installation:
-
-% \begin{enumerate}
-%   \item Download \LaTeX.  There are two major \LaTeX\ distributions — \href{https://miktex.org/}{\MikTeX} and \href{https://www.tug.org/texlive/}{\TeXLive} — that share lots of similarity, and \LaTeX\ documents are portable between them. This means that, for most users, both systems are equally usable.
-%   \begin{description}
-%     \item [\TeX-Live] is maintained by (La)\TeX\ developers and is certainly the best distribution you may install in your computer:  However, the default distribution will take more than 5\,GB on your hard disk… so, if you are not short on disk space, install \TeXLive!
-%     \item[Mik\TeX] will, by default, install only a minimal set of packages. The extra/additional packages will be installed on the fly.  Installing packages on the fly is useful if disk space is limited, but has its own caveats in the longer term.  Definitely choose \MikTeX\ if you're short on disk space.
-%   \end{description}
-%   Which one to download?  There are \href{https://tex.stackexchange.com/questions/20036/what-are-the-advantages-of-tex-live-over-miktex}{pros and cons for both distributions} so it is essentially a question of where does your heart falls first!  Mine falls to \TeXLive, but yours can fall elsewhere!  \emojiSmile
-%   \item Install \LaTeX. Installation of \LaTeX\ is as hard as installing any other software.  Just do your best and you will certainly succeed. 
-%   \item Update your \LaTeX\ installation using the \emph{\TeXLive Utility} program ot the \MikTeX\ console.
-%   \item Download the \gls{novathesis} template by either:
-%   \begin{itemize}
-%     \item Cloning the \href{https://github.com/joaomlourenco/novathesis}{GitHub repository} with
-%     \begin{verbatim}    git clone --depth=1 https://github.com/joaomlourenco/novathesis.git\end{verbatim}
-%     or
-%     \item Downloading the \href{https://github.com/joaomlourenco/novathesis/archive/main.zip}{latest version from the GitHub repository as a Zip file}.
-%   \end{itemize}
-
-%   \item \label{it:project_available} Download additional School specific files if applicable:
-%   \begin{description}
-%     \item[Universidade do Minho (UMINHO)] download the required \emph{NewsGotT} font files from
-%     \url{https://github.com/joaomlourenco/novathesis-extras/raw/main/Fonts/NewsGotT.zip}\\
-%     then unzip the file and copy the~3~font files
-% \begin{flushleft}
-% \hspace*{0.5cm}“\verb!n015002t.ttf!”, “\verb!n015003t.ttf!”, and “\verb!n015006t.ttf!”
-% \end{flushleft}
-%     to the folder
-% \begin{flushleft}
-% \hspace*{0.5cm}“\verb!NOVAthesisFiles/FontStyles/Fonts!”.
-% \end{flushleft}
-%     \item[Escola Superior de Enfermagem do Porto (ESEP)] download the required \emph{Calibri} font files from
-%     \url{https://github.com/joaomlourenco/novathesis-extras/raw/main/Fonts/Calibri.zip}\\
-%     then unzip the file and copy the~4~font files
-% \begin{flushleft}
-% \hspace*{0.5cm}“\verb!Calibri.ttf!”, “\verb!Calibrib.ttf!”, “\verb!Calibrii.ttf!”, and “\verb!Calibriz.ttf!”
-% \end{flushleft}
-%       \noindent to the folder
-% \begin{flushleft}
-% \hspace*{0.5cm}\verb!NOVAthesisFiles/FontStyles/Fonts!.
-% \end{flushleft}
-%   \end{description}
-
-%   \item Compile the document with you favorite LaTeX processor (pdfLaTeX, XeLaTeX or LuaLaTeX).
-%   \begin{itemize}
-%     \item The main file is named “\verb!template.tex!”, but you are free to rename it as you please.
-%     \item Either load the main file in your favorite \href{https://en.wikipedia.org/wiki/Comparison_of_TeX_editors}{LaTeX text editor} and press the appropriate (\emph{magic}) button to generate a PDF file, or open a terminal and compile it with “\verb!latexmk -pdf template!”. If you use a \LaTeX\ text editor, please notice that the \gls{novathesis} template uses “\verb!biber!” and not “\verb!bibtex!” to process the bibliography, which means that most probably you have to open the \emph{Editor Preferences} and somewhere (depending on the Editor you are using) change “\verb!bibtex!” to “\verb!biber!”.
-%     \item Notice that, due to the external font sets used, \pdfLaTeX\ will not work for both \textbf{UMINHO} and \textbf{ESEP}, and you have to use either \XeLaTeX\ (“\verb!latexmk -pdfxe template!”) or \LuaLaTeX (“\verb!latexmk -pdflua template!”).
-%   \end{itemize}
-%   \item Edit the files in the “Config” folder:
-%     \bgroup
-%     \rowcolors{1}{}{GhostWhite}
-%     \begin{xltabular}{\textwidth}{>{\ttfamily}lX}
-%         \toprule
-%         \rowcolor{Gainsboro}%
-%         File & Contents \\
-%         \midrule
-% 0\_memoir.tex       & Options specific for the memoir package. \emph{Don't touch this file unless you know what you are doing!}\\
-% 1\_novathesis.tex   & Configure the template (e.g., the document type, the school, the languages used, etc.)\\
-% 2\_biblatex.tex     & Select how your citations and bibliographic references will be printed.  The default is numbers inside square brackets, e.g. \cite{novathesis-manual}, but you can change it to other formats, such as author-year, e.g., \citeauthor{novathesis-manual}~(\citeyear{novathesis-manual}).\\
-% 3\_cover.tex        & Configure cover contents (e.g., thesis/dissertation title, author's name, advisers' names, committee members' names, date, etc).\\
-% 4\_files.tex        & Select the files for chapters, appendices, annexes, abstracts, glossaries, etc.\\
-% 5\_packages.tex     & User's customization.  Load additional packages and define your own commands to be used throughout the document.\\
-% 6\_list\_of.tex     & Configure the lists to be printed (table of contents, list of figures, list of tables, list of listings, etc). \emph{Don't touch this file unless you know what you are doing!}\\
-% 9\_nova\_fct.tex    & Configuration specific to NOVA-FCT. Otherwise ignored.\\
-% 9\_nova\_ims.tex    & Configuration specific to NOVA-IMS. Otherwise ignored.\\
-% 9\_nova\_itqb.tex   & Configuration specific to NOVA-ITQB. Otherwise ignored.\\
-% 9\_ulisboa\_fmv.tex & Configuration specific to ULISBOA-FMV. Otherwise ignored.\\
-% 9\_uminho.tex       & Configuration specific to UMINHO (all Schools). Otherwise ignored.\\
-%         \bottomrule
-%     \end{xltabular}
-%     \egroup
-%     % \end{longtblr}
-%     \item Recompile de document.
-%     \item And you're done with a beautifully formatted thesis/dissertation! {\setlength{\twemojiDefaultHeight}{1.5\twemojiDefaultHeight}\emojiSmile}
-% \end{enumerate}
-
-% % subsection with_a_local_latex_installation (end)
-
-% \subsection{With a Remote Cloud-based Service} % (fold)
-% \label{sub:with_a_remote_cloud_based_service}
-
-% Follow these steps to get started with a remote \LaTeX\ installation:
-
-% \begin{itemize}
-%   \item Download the \href{https://github.com/joaomlourenco/novathesis/archive/main.zip}{latest version from the GitHub repository as a Zip file}.
-%   \item Login to your favorite LaTeX cloud service. I recommend \href{https://www.overleaf.com/?r=f5160636&rm=d&rs=b}{Overleaf} but there are alternatives. These instructions apply to Overleaf and you'll have to adapt for other providers.
-%   \item In the menu select \fbox{New project}$\rightarrow$\fbox{Upload project}.
-%   \item Select “\verb!template.tex!” as the main file.
-%   \item Follow from Step~\ref{it:project_available} above in Section~\ref{sub:with_a_local_latex_installation} (\nameref{sub:with_a_local_latex_installation}).
-% \end{itemize}
-
-% % subsection with_a_remote_cloud_based_service (end)
-
-
-% \section{Folder and Files}
-% \label{sec:folders_and_files}
-
-% The \gls{novathesis} template is organized into many files and folders. At the main level it includes the following files and folders listed in Table~\ref{tab:folders_and_files}.
-
-% \newcommand{\accessAllowed}{\includegraphics[align=c,width=1.9em]{access_allowed}}
-% \newcommand{\accessForbiden}{\includegraphics[align=c,width=1.9em]{dont_touch}}
-
-% \bgroup
-%     \rowcolors{1}{}{GhostWhite}
-%       \begin{xltabular}{\textwidth}{>{\ttfamily}l>{\itshape}lcX}
-%         \caption{The folders and files.}
-%         \label{tab:folders_and_files}\\
-%         \toprule
-%         \rowcolor{Gainsboro}%
-%         Name & Type & Access & Contents \\
-%         \midrule
-% novathesis.cls     & file    & \accessForbiden &
-% The main class file. %It will include additional files from “\texttt{NOVAthesisFiles}” folder and its sub-folders.
-% \\
-% template.tex      & file    & \accessForbiden &
-% The main template file. You need to \emph{compile} this file with one of \pdfLaTeX, \XeLaTeX, or \LuaLaTeX\ to obtain the PDF file (“\texttt{template.pdf}”).
-% \\
-% template.pdf      & file    & \accessAllowed &
-% A possible result of applying \pdfLaTeX\ to the “\texttt{template.tex}” file. The look and feel of the document will depend on the parametrization/configuration (e.g., School) of this template.
-% \\
-% Chapters          & folder  & \accessAllowed &
-% Examples of document contents, including Chapters, Appendices, Annexes, Abstracts, Glossaries, Lists of Symbols, etc. Replace them with your own.
-% \\
-% Bibliography      & folder    & \accessAllowed &
-% Where all your bibliography files should be located. You may have has many as you want, as long as you add them to the template with “\texttt{\symbol{`\\}ntaddfile\{bib\}\{FILENAME.bib\}}!”. \\
-% \\
-% NOVAthesisFiles   & folder  & \accessForbiden &
-% Additional files for the \gls{novathesis} template.  This is where all the juice is so, unless you are a \TeX magician, don't mess up with the files and folders inside this folder.
-% \\
-%         \bottomrule
-%         \end{xltabular}
-%     % \end{longtblr}
-% \egroup
-
-% % section folder_structure (end)
-
-% % ===================
-% % = Package options =
-% % ===================
-% \section{The \glsfmtshort{novathesisclass}\ Class Options}
-% \label{sec:package_options}
-
-% The \gls{novathesisclass}\ can be customized with the options listed below.
-
-% \newcommand{\classoption}[4]{\textbf{#1=OPT}\newline\emph{\small#2}&\textbf{#3}\newline{\small#4}\\}
-% \newcommand{\defaultopt}[1]{$\Rightarrow$~\emph{Default: \texttt{#1}}\newline}
-% \newcommand{\defaultit}[1][default]{($\Leftarrow$~\emph{#1})}
-
-% \bgroup
-%   % \rowcolors{1}{}{GhostWhite}
-% \begin{xltabular}{\linewidth}{>{\hsize=.4\hsize\raggedright\arraybackslash}X>{\hsize=.6\hsize}X}
-%   \toprule
-% %----------------------------------------------------------------------
-%   \classoption{doctype}%
-%     {phd, phdprop, phdplan, msc, mscplan, bsc, plain}%
-%     {The type of the document.}{
-%     \begin{tabular}{@{}r@{ $\rightarrow$ }l@{}}
-%         phd & PhD thesis \defaultit.\\
-%     phdprop & PhD thesis proposal (for FCT-NOVA).\\
-%     phdplan & PhD thesis plan.\\
-%         msc & MSc dissertation.\\
-%     mscplan & MSc dissertation plan.\\
-%         bsc & BSc report.\\
-%       plain & Other report.\\
-%     \end{tabular}
-%     }
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{school}%
-%     {nova/fct, nova/fcsh, nova/ims, nova/ensp, nova/itqb,\newline ulisboa/ist, ulisboa/fc, ulisboa/fmv,\newline uminho/ea, uminho/ec, uminho/ed, uminho/ee, uminho/eeg, uminho/em, uminho/ep, uminho/ese, uminho/ics, uminho/ie, uminho/elach, uminho/i3b,\newline ips/ests, ipl/isel, ulht/deisi, other/esep}%
-%     {Selection of the university and of the school.}%
-%     {\defaultopt{nova/fct} 
-%      This option changes the typesetting of the de document to some specific School formating and layout, like covers, margins, fonts, paragraph spacing and indentation, etc.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{docstatus}%
-%     {draft, provisional, final}%
-%     {The current status of the document.}{
-%     \begin{tabular}{@{}r@{ $\rightarrow$ }X@{}}
-%          draft        & Working version \defaultit.\\
-%          provisional  & Version for submission.\\
-%          final        & Final version.\\
-%     \end{tabular}
-%     }
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{lang}%
-%     {en, pt, de, es, fr, gr, it}%
-%     {The main language for the document.}{
-%     \begin{tabular}{@{}l@{ $\rightarrow$ }X@{}}
-%          en & Enlgish \defaultit.\\
-%          pt & Portuguese.\\
-%          de & German.\\
-%          es & Spanish.\\
-%          fr & French.\\
-%          gr & Greek.\\
-%          it & Italian.\\
-%     \end{tabular}
-%     }
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{abstractorder}%
-%     {\{L$_1$, L$_2$, …, L$_n$\}\newline \{DL=\{L$_1$, L$_2$, …, L$_n$\}\}}%
-%     {Forces the abstracts languages and order.}{
-%     \begin{tabular}{@{}l@{ $\rightarrow$ }X@{}}
-%          DL & Document language \defaultit[defaults to the main language].\\
-%          L$_i$ & A two-letters language code.\\
-%     \end{tabular}
-%     }
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{lang/extra}%
-%     {\{L$_1$, L$_2$, …, L$_n$\}}%
-%     {Additional languages used in the document.}{
-%     \defaultopt{\{\}} 
-%     Besides the main language and those used in the abstracts.\newline
-%     \begin{tabular}{@{}l@{ $\rightarrow$ }X@{}}
-%          L$_i$ & A two-letters language code.\\
-%     \end{tabular}
-%     }
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{linkscolor}%
-%     {A color of your choice.}%
-%     {The color for all the hyperlinks in the PDF file.}%
-%     {\defaultopt{darkblue} 
-%      The “\texttt{media=paper}” option (see below) will override this option to “\texttt{black}”}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{media}%
-%     {screen, paper}%
-%     {The target of the PDF.}%
-%     {\defaultopt{screen} 
-%      By default, PDF for screen has colored links and identical left and right margins, while PDF for paper (to print) has black links and may have different left and right margins.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{print/index}%
-%     {true, false}%
-%     {Produce the document index.}%
-%     {\defaultopt{false} 
-%      The index (\emph{índice remissivo}) is a keyword index typeset an the end of the document. WARNING: Should not be confused with the table of contents.}
-%     \midrule
-    
-    
-    
-    
-% %----------------------------------------------------------------------
-%   \classoption{fontstyle}%
-%     {bookman, charter, fourier, kpfonts(*), mathpazo1, mathpazo2, newcent}%
-%     {The font set to be used in the document.}{Please note that a font set include definitions for the main text, headings, maths, etc.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{chapstyle}%
-%     {bianchi, bluebox, brotherton, dash, default, elegant(*), ell, ger, hansen, ist, jenor, lyhne, madsen, pedersen, veelo, vz14, vz34, vz43}%
-%     {The chapter style}{The look of the chapter beginning.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{converlang}%
-%     {en, pt(*)}%
-%     {The language to be used when typesetting the cover page.}{}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{otherlistsat}%
-%     {front(*), back}%
-%     {Where to put the other lists besides the table of contents.}{The default is (\texttt{front}) before the main text.  But some scientific areas prefer them at the end of the document (\texttt{back}), just before the Appendixes.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{statement}%
-%     {true, false(*)}%
-%     {Include or don't include the contents of the “\texttt{statement}” file.}{The default is for this file to be ignored (if it exists).}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{spine}%
-%     {true, false(*)}%
-%     {Generate the book spine and the last page in the PDF.}{}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{biblatex}%
-%     {OPT=\{list of options for \texttt{biblatex}\}}%
-%     {Customize \texttt{biblatex}, the bibliography management system used in this class.}{Probably you will want to change the value of the \texttt{biblatex} “\texttt{style}” option. For other customizations of \texttt{biblatex} check its manual.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{memoir}%
-%     {OPT=\{list of options for \texttt{memoir}\}}%
-%     {Customize the base class \texttt{memoir}.}{The \texttt{memoir} manual should be the first document to be consulted when looking for “\textbf{how can I do this?}” You may what to change the base font size from 11pt to a smaller (10pt) or larger (12pt) size.  Also, remember to change the “\texttt{draft}” to final when your document is finished.}
-%     \midrule
-%     \bottomrule
-% \end{xltabular}
-% \egroup
-% % \end{ctabular}
-
-% \section{Additional considerations about the class options}
-% \label{sec:additional_considerations}
-
-% In this section we will provide some additional considerations about some of the customizations available as class options.
-
-% \subsection{The main language}
-% \label{sub:the_main_language}
-
-% The choice of the main language with the option “\texttt{lang=OPT}” affects:
-
-% \begin{itemize}
-%   \item \textbf{The order of the summaries.} First is printed the abstract in the main language and then in the foreign language. This means that if your main language for the document in English, you will see first the “abstract” (in English) and then the “resumo” (in Portuguese). If you switch the main language for the document for Portuguese, it will also automatically switch the order of the summaries to “resumo” and then “abstract”.
-%   \item \textbf{The names for document sectioning.} E.g., ``Chapter'' vs.\ ``Capítulo'', ``Table of Contents'' vs.\ ``Índice'', ``Figure'' vs.\ ``Figura'', etc.
-%   \item \textbf{The type of documents in the bibliography.} E.g., ``Technical Report'' vs.\ ``Relatório Técnico'', ``PhD Thesis'' vs.\ ``Tese de Doutoramento'', etc.
-% \end{itemize}
-
-% No mater which language you chose, you will always have the appropriate hyphenation rules according to the language at that point. You always get Portuguese hyphenation rules in the ``Resumo'', English hyphenation rules in the ``Abstract'', and then the main language hyphenation rules for the rest of the document.
-
-% % subsection the_main_language (end).
-
-% % section additional_consideration (end)
-
-
-% \subsection{Class of Text}
-% \label{sub:class_of_text}
-
-% You must choose the class of text for the document. The available options are:
-
-% \begin{enumerate}
-%   \item \textbf{bsc} --- BSc graduation report.
-%   \item \textbf{*mscplan} --- Preparation of MSc dissertation. This is a preliminary report graduate students at DI-FCT-NOVA must prepare to conclude the first semester of the two-semesters MSc work. The files specified by \verb!\ntdedicatoryfile! and \verb!\acknowledgmentsfile! are ignored, even if present, for this class of document.
-%   \item \textbf{msc} --- MSc dissertation.
-%   \item \textbf{phdprop} ---  Proposal for a PhD work. The files specified by \verb!\ntdedicatoryfile! and \verb!\acknowledgmentsfile! are ignored, even if present, for this class of document.
-%   \item \textbf{prepphd} ---  Preparation of a PhD thesis. This is a preliminary report PhD students at DI-FCT-NOVA must prepare before the end of the third semester of PhD work. The files specified by \verb!\ntdedicatoryfile! and \verb!\acknowledgmentsfile! are ignored, even if present, for this class of document.
-%   \item \textbf{phd} --- PhD dissertation.
-% \end{enumerate}
-% % subsection class_of_text (end)
-
-% % ============
-% % = Printing =
-% % ============
-% \subsection{Printing}
-% \label{sub:printing}
-
-% You must choose how your document will be printed. The available options are:
-% \begin{enumerate}
-%   \item \textbf{oneside} --- Single side page printing.
-%   \item \textbf{*twoside} --- Double sided page printing.
-% \end{enumerate}
-% % subsection printing (end)
-
-% % =============
-% % = Font Size =
-% % =============
-% \subsection{Font Size}
-% \label{ssec:font_size}
-
-% You must select the encoding for your text. The available options are:
-% \begin{enumerate}
-%   \item \textbf{11pt} --- Eleven (11) points font size.
-%   \item \textbf{*12pt} --- Twelve (12) points font size. You should really stick to 12pt\ldots
-% \end{enumerate}
-% % subsection font_size (end)
-
-% % =================
-% % = Text encoding =
-% % =================
-% \subsection{Text Encoding}
-% \label{ssec:text_encoding}
-
-% You must choose the font size for your document. The available options are:
-% \begin{enumerate}
-%   \item \textbf{latin1} --- Use Latin-1 (\href{http://en.wikipedia.org/wiki/ISO/IEC_8859-1}{ISO 8859-1}) encoding.  Most probably you should use this option if you use Windows;
-%   \item \textbf{utf8} --- Use \href{http://en.wikipedia.org/wiki/UTF-8}{UTF8} encoding.    Most probably you should use this option if you are not using Windows.
-% \end{enumerate}
-% % subsection font_size (end)
-
-% % ============
-% % = Examples =
-% % ============
-% \subsection{Examples}
-% \label{ssec:examples}
-
-% Let's have a look at a couple of examples:
-
-% \begin{itemize}
-%   \item Preparation of PhD thesis, in portuguese, with 11pt size and to be printed single sided (I wonder why one would do this!)\\
-%   \verb!\documentclass[prepphd,pt,11pt,oneside,latin1]{thesisdifct-nova}!
-%   \item MSc dissertation, in English, with 12pt size and to be printed double sided\\
-%   \verb!\documentclass[msc,en,12pt,twoside,utf8]{thesisdifct-nova}!
-% \end{itemize}
-% % subsection examples (end)
-
-% \section{How to Write Using \LaTeX}
-% \label{sec:how_to_write_using_latex}
-
-% Please have a look at Chapter~\ref{cha:a_short_latex_tutorial_with_examples}, where you may find many examples of \LaTeX constructs, such as Sectioning, inserting Figures and Tables, writing Equations, Theorems and algorithms, exhibit code listings, etc.
-
-% % section how_to_write_using_latex (end)
-
-
-
-% \section{Example glossary, acronyms, and symbols}
-% %
-% % \todo[inline]{A a note in a line by itself.}
-% %
-This is the first occurrence of an abbreviation: \gls{abbrev}. And now the second occurrence of the same abbreviation: \gls{abbrev}. And a new acronym with capital letter: \Gls{xpt} and reused \gls{xpt}.  Let's also use a few other acronyms such as \gls{aaa}, \gls{aab}, \gls{aba}, \gls{bbb} and \gls{xpt}.
-% In geometry, the area enclosed by a circle of radius \gls{r} is $\pi r^2$. Here the Greek letter \gls{pi} is equal to the ratio of the circumference of any circle to its diameter.
-% Lets add ``\gls{computer}'' to the glossary! Be carefull with mathematical symbols in acronyms, please see the definition of \gls{mu}.
-
-% % Reference to Potassium \gls{chem:potassio} and Sodium \gls{chem:sodio} as well.
-
-% %
-% % Please note that
-% % \begin{center}
-% %   \textbf{\large this package and template are not official for FCT/NOVA}.
-% % \end{center}
-
-
-
-% % \printbibliography[heading=subbibliography, segment=\therefsegment, title={\bibname\ for chapter~\thechapter}]
-
-
-% \endinput
-
-% %!TEX root = ../template.tex
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% chapter2.tex
-% %% NOVA thesis document file
-% %%
-% %% Chapter with the template manual
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% \typeout{NT FILE chapter2.tex}%
-
-% \chapter{NOVAthesis Template \emph{User's Manual}}
-% \label{cha:users_manual}
-
-% \glsresetall
-
-% \begin{center}
-%   \fbox{\LARGE
-%     This manual is outdated and must be revised!}
-% \end{center}
-
-% Referência ao Potássio é \gls{chem:potassio} e Sódio também \gls{chem:sodio}.
-
-% \section{Introduction}
-% \label{sec:introduction}
-
-% This chapter describes how to use the \gls{novathesis}\ Template and the \gls{novathesisclass} file.  I will assume you have a working installation of \LaTeX, wither local (in your own computer) or remote (in Overleaf), and that it compiled successfully the default configuration (PhD for \gls{FCT}).
-
-
-% \section{Folder Structure}
-% \label{sec:folder_structure}
-
-% The \gls{novathesis} template is organized into many files and folders. At the main level it includes the following files and folders:
-
-% \noindent
-% \bgroup
-% \rowcolors{1}{GhostWhite}{}
-% \begin{xltabular}{\linewidth}{>{\ttfamily}l>{\itshape}l>{\upshape}X}
-% novathesis.cls     & file    &
-% The main class file. It will include additional files from \texttt{NOVAthesisFiles} folder and its sub-folders.
-% \\
-% template.tex      & file    &
-% The main template file. You need to \emph{compile} this file with one of pdf\LaTeX, \XeLaTeX, or \LuaLaTeX\ to obtain the \texttt{template.pdf} file.
-% \\
-% bibliography.bib  & file    &
-% An example of a bibliography file. You may have has many as you want. \\
-% template.pdf      & file    &
-% A possible result of applying pdf\LaTeX\ to the \texttt{template.tex} file. The template supports multiple types of documents (e.g., MSc dissertation, PhD thesis, …) and multiple Schools (e.g., FCT-NOVA, FCSH-NOVA, IST-UL, FC-UL, …) and each will produce different results.
-% \\
-% Chapters          & folder  & Examples of thesis chapters. Replace them with your own chapters.
-% \\
-% Examples          & folder  & Some more examples of the use of the template for different document types and Schools.
-% \\
-% Scripts           & folder  & Some (possibly useful) scripts for Unix-based systems (Linux, Mac OSx). If you are a windows user, ignore this folder (you may safely delete it if you want).
-% \\
-% NOVAthesisFiles   & folder  &
-% Additional files for the \gls{novathesisclass}\ file.  Unless you know what you are doing, avoid messing up with the files and folders inside this folder (except for deleting the unused Schools, see below).
-% \\
-% \end{xltabular}
-% \egroup
-
-% The \texttt{NOVAthesisFiles} folder contains additional files and folders that complement the main \gls{novathesisclass}\ file.  These are:
-
-% \noindent
-% \bgroup
-% \rowcolors{1}{GhostWhite}{}
-% \begin{tabularx}{\linewidth}{>{\ttfamily}l>{\itshape}l>{\upshape}X}
-% README.txt      & file    &
-% A file that should be read!  :)
-% \\
-% fix-babel.tex   & file    &
-% Simple fixes to the \texttt{babel} package.
-% \\
-% lang-text.ldf   & file    &
-% Translations of important strings used in the template.  Currently fully supported are Portuguese and English, but French is on the way.  If you add translations for your own language, please be so kind and send them to me. Thank you!
-% \\
-% options.tex     & file    &
-% Processing of \gls{novathesisclass}\ options.  \emph{Don't mess with this!}
-% \\
-% packages.tex    & file    &
-% Additional packages to be loaded into the \gls{novathesis}\ template. \emph{You should not mess with this!}
-% \\
-% spine.tex       & file    &
-% This file is loaded only if the option \texttt{spine=full} or \texttt{spine=trim}, and includes the typesetting of the book spine.
-% \\
-% ChapStyles      & folder  &
-% Contains a lot of files, one for each chapter style.  If you really know what you are doing, you may add your own chapter style here.
-% \\
-% FontStyles      & folder  &
-% Contains a few files, one for each set of fonts (main text font, chapter font, section font, subsection font, etc).  If you really know what you are doing, you may add your own set here.
-% \\
-% Schools         & folder  &
-% Configuration files for each school.  This folder is organized into subfolders, one for each university.  \emph{You may safely delete all the subfolders except the one for your University.}  Then open the subfolder of your University and \emph{you may safely delete all the subfolders except the one for your School/Faculty}.
-% \\
-% \end{tabularx}
-% \egroup
-
-% As stated above, the \texttt{Schools} folder contains per-university folders and per-school (faculty) subfolders.  Currently these are the available folders:
-
-% \noindent
-% \bgroup
-% \rowcolors{1}{GhostWhite}{}
-% \begin{tabularx}{\linewidth}{>{\ttfamily}r@{~/~}>{\ttfamily}l>{\itshape}l>{\upshape}X}
-% ul     & ist    & folder  &
-% The folder for the \href{http://www.tecnico.ulisboa.pt}{\emph{Instituto Superior Técnico}} of the \emph{University of Lisbon}.
-% \\
-% nova    & fcsh   & folder  &
-% The folder for the \href{http:www.fcsh.unl.pt}{\emph{Faculty of Human and Social Sciences}}  of the \emph{NOVA University of Lisbon}.
-% \\
-% nova    & fct    & folder  &
-% The folder for the \href{http:www.fct.unl.pt}{\emph{Faculty of Sciences and Technology}} of the \emph{NOVA University of Lisbon}.
-% \\
-% nova    & novaims    & folder  &
-% The folder for the \href{http:www.novaims.unl.pt}{\emph{Information and Management School}} of the \emph{NOVA University of Lisbon}.
-% \\
-% \end{tabularx}
-% \egroup
-
-% % section folder_structure (end)
-
-% % ===================
-% % = Package options =
-% % ===================
-% \section{\glsfmtshort{novathesisclass}\ Class Options}
-% \label{sec:package_options}
-
-% The \gls{novathesisclass}\ can be customized with the options listed below.
-
-% \newcommand{\classoption}[3]{\textbf{#1=OPT}\qquad #2\\\qquad\emph{#3}\\}
-
-% \noindent
-% \begin{ctabular}{@{}p{\linewidth}@{}}
-%   \toprule
-% %----------------------------------------------------------------------
-%   \classoption{doctype}%
-%     {phd(*), phdplan, phdprop, msc, mscplan, bsc}%
-%     {The type of the document: PhD Thesis (---~Default~---), PhD Plan, PhD Proposal, MSc Dissertation, MSc Plan, BSc Report}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{school}%
-%     {nova/fct(*), nova/fcsh, nova/ims, ul/ist, ul/fc}%
-%     {The name of the school. This option changes the typesetting of the cover and some School specific formating, like margins, fonts, paragraph spacing and indentation, etc…}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{lang}%
-%     {en(*), pt}%
-%     {The main language for the document.  Currently only Portuguese and English are supported.  Other languages are expected to be support in forthcoming versions.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{fontstyle}%
-%     {bookman, charter, fourier, kpfonts(*), mathpazo1, mathpazo2, newcent}%
-%     {The font set to be used in the document.  Please note that a font set include definitions for the main text, headings, maths, etc.}
-%     \midrule
-% %----------------------------------------------------------------------
-% %----------------------------------------------------------------------
-%   \classoption{chapstyle}%
-%     {bianchi, bluebox, brotherton, dash, default, elegant(*), ell, ger, hansen, ist, jenor, lyhne, madsen, pedersen, veelo, vz14, vz34, vz43}%
-%     {The chapter style, i.e., the look of the chapter beginning.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{converlang}%
-%     {en, pt(*)}%
-%     {The language to be used when typesetting the cover page.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{otherlistsat}%
-%     {front(*), back}%
-%     {Where to put the other lists besides the table of contents. The default is (\texttt{front}) before the main text.  But some scientific areas prefer them at the end of the document (\texttt{back}), just before the Appendixes.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{statement}%
-%     {true, false(*)}%
-%     {Include or don't include the contents of the “\texttt{statement}” file. The default is for this file to be ignored (if it exists).}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{linkscolor}%
-%     {darkblue(*), black}%
-%     {The color for all the hyperlinks in the PDF file.  The “\texttt{media=paper}” option (see below) will override this option to “\texttt{black}”}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{spine}%
-%     {true, false(*)}%
-%     {Generate the book spine and the last page in the PDF.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{biblatex}%
-%     {OPT=\{list of options for \texttt{biblatex}\}}%
-%     {Customize \texttt{biblatex}, the bibliography management system used in this class. Probably you will want to change the value of the \texttt{biblatex} “\texttt{style}” option. For other customizations of \texttt{biblatex} check its manual.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{memoir}%
-%     {OPT=\{list of options for \texttt{memoir}\}}%
-%     {Customize the base class \texttt{memoir}. The \texttt{memoir} manual should be the first document to be consulted when looking for “\textbf{how can I do this?}” You may what to change the base font size from 11pt to a smaller (10pt) or larger (12pt) size.  Also, remember to change the “\texttt{draft}” to final when your document is finished.}
-%     \midrule
-% %----------------------------------------------------------------------
-%   \classoption{media}%
-%     {screen(*), paper}%
-%     {Behavior to be customized in the school options/configuration. Expected definitions for screen are: left and right margins are equal and use colored links. Expected definitions for paper are: left and right margins are different and use black links.}
-%     \bottomrule
-% \end{ctabular}
-
-% \section{Additional considerations about the class options}
-% \label{sec:additional_considerations}
-
-% In this section we will provide some additional considerations about some of the customizations available as class options.
-
-% \subsection{The main language}
-% \label{sub:the_main_language}
-
-% The choice of the main language with the option “\texttt{lang=OPT}” affects:
-
-% \begin{itemize}
-%   \item \textbf{The order of the summaries.} First is printed the abstract in the main language and then in the foreign language. This means that if your main language for the document in English, you will see first the “abstract” (in English) and then the “resumo” (in Portuguese). If you switch the main language for the document for Portuguese, it will also automatically switch the order of the summaries to “resumo” and then “abstract”.
-%   \item \textbf{The names for document sectioning.} E.g., ``Chapter'' vs.\ ``Capítulo'', ``Table of Contents'' vs.\ ``Índice'', ``Figure'' vs.\ ``Figura'', etc.
-%   \item \textbf{The type of documents in the bibliography.} E.g., ``Technical Report'' vs.\ ``Relatório Técnico'', ``PhD Thesis'' vs.\ ``Tese de Doutoramento'', etc.
-% \end{itemize}
-
-% No mater which language you chose, you will always have the appropriate hyphenation rules according to the language at that point. You always get Portuguese hyphenation rules in the ``Resumo'', English hyphenation rules in the ``Abstract'', and then the main language hyphenation rules for the rest of the document.
-
-% % subsection the_main_language (end).
-
-% % section additional_consideration (end)
-
-
-% \subsection{Class of Text}
-% \label{sub:class_of_text}
-
-% You must choose the class of text for the document. The available options are:
-
-% \begin{enumerate}
-%   \item \textbf{bsc} --- BSc graduation report.
-%   \item \textbf{*mscplan} --- Preparation of MSc dissertation. This is a preliminary report graduate students at DI-FCT-NOVA must prepare to conclude the first semester of the two-semesters MSc work. The files specified by \verb!\ntdedicatoryfile! and \verb!\acknowledgmentsfile! are ignored, even if present, for this class of document.
-%   \item \textbf{msc} --- MSc dissertation.
-%   \item \textbf{phdprop} ---  Proposal for a PhD work. The files specified by \verb!\ntdedicatoryfile! and \verb!\acknowledgmentsfile! are ignored, even if present, for this class of document.
-%   \item \textbf{prepphd} ---  Preparation of a PhD thesis. This is a preliminary report PhD students at DI-FCT-NOVA must prepare before the end of the third semester of PhD work. The files specified by \verb!\ntdedicatoryfile! and \verb!\acknowledgmentsfile! are ignored, even if present, for this class of document.
-%   \item \textbf{phd} --- PhD dissertation.
-% \end{enumerate}
-% % subsection class_of_text (end)
-
-% % ============
-% % = Printing =
-% % ============
-% \subsection{Printing}
-% \label{sub:printing}
-
-% You must choose how your document will be printed. The available options are:
-% \begin{enumerate}
-%   \item \textbf{oneside} --- Single side page printing.
-%   \item \textbf{*twoside} --- Double sided page printing.
-% \end{enumerate}
-% % subsection printing (end)
-
-% % =============
-% % = Font Size =
-% % =============
-% \subsection{Font Size}
-% \label{ssec:font_size}
-
-% You must select the encoding for your text. The available options are:
-% \begin{enumerate}
-%   \item \textbf{11pt} --- Eleven (11) points font size.
-%   \item \textbf{*12pt} --- Twelve (12) points font size. You should really stick to 12pt\ldots
-% \end{enumerate}
-% % subsection font_size (end)
-
-% % =================
-% % = Text encoding =
-% % =================
-% \subsection{Text Encoding}
-% \label{ssec:text_encoding}
-
-% You must choose the font size for your document. The available options are:
-% \begin{enumerate}
-%   \item \textbf{latin1} --- Use Latin-1 (\href{http://en.wikipedia.org/wiki/ISO/IEC_8859-1}{ISO 8859-1}) encoding.  Most probably you should use this option if you use Windows;
-%   \item \textbf{utf8} --- Use \href{http://en.wikipedia.org/wiki/UTF-8}{UTF8} encoding.    Most probably you should use this option if you are not using Windows.
-% \end{enumerate}
-% % subsection font_size (end)
-
-% % ============
-% % = Examples =
-% % ============
-% \subsection{Examples}
-% \label{ssec:examples}
-
-% Let's have a look at a couple of examples:
-
-% \begin{itemize}
-%   \item Preparation of PhD thesis, in portuguese, with 11pt size and to be printed single sided (I wonder why one would do this!)\\
-%   \verb!\documentclass[prepphd,pt,11pt,oneside,latin1]{thesisdifct-nova}!
-%   \item MSc dissertation, in English, with 12pt size and to be printed double sided\\
-%   \verb!\documentclass[msc,en,12pt,twoside,utf8]{thesisdifct-nova}!
-% \end{itemize}
-% % subsection examples (end)
-
-% \section{How to Write Using \LaTeX}
-% \label{sec:how_to_write_using_latex}
-
-% Please have a look at Chapter~\ref{cha:a_short_latex_tutorial_with_examples}, where you may find many examples of \LaTeX constructs, such as Sectioning, inserting Figures and Tables, writing Equations, Theorems and algorithms, exhibit code listings, etc.
-
-% % section how_to_write_using_latex (end)
-
-
-
-% \section{Example glossary, acronyms, and symbols}
-% %
-% % \todo[inline]{A a note in a line by itself.}
-% %
-% This is the first occurrence of an abbreviation: \gls{abbrev}. And now the second occurrence of the same abbreviation: \gls{abbrev}. And a new acronym with capital letter: \Gls{xpt} and reused \gls{xpt}.  Let's also use a few other acronyms such as \gls{aaa}, \gls{aab}, \gls{aba}, \gls{bbb} and \gls{xpt}.
-% In geometry, the area enclosed by a circle of radius \gls{r} is $\pi r^2$. Here the Greek letter \gls{pi} is equal to the ratio of the circumference of any circle to its diameter.
-% Lets add ``\gls{computer}'' to the glossary! Be carefull with mathematical symbols in acronyms, please see the definition of \gls{mu}.
-% %
-% % Please note that
-% % \begin{center}
-% %   \textbf{\large this package and template are not official for FCT/NOVA}.
-% % \end{center}
-
-
-
-% % \printbibliography[heading=subbibliography, segment=\therefsegment, title={\bibname\ for chapter~\thechapter}]
